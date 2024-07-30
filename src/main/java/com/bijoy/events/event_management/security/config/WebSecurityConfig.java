@@ -3,6 +3,7 @@ package com.bijoy.events.event_management.security.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -35,11 +36,12 @@ public class WebSecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.httpBasic().and().authorizeHttpRequests()
-                .requestMatchers(HttpMethod.GET, "/events/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/events").hasRole("ADMIN")
-                .anyRequest().permitAll();
-        http.csrf().disable();
+        http.httpBasic(Customizer.withDefaults());
+        http.authorizeHttpRequests(authorize ->
+                authorize.requestMatchers(HttpMethod.GET, "/events/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/events").hasRole("ADMIN")
+                        .anyRequest().permitAll());
+        http.csrf(csrf -> csrf.disable());
         return http.build();
     }
 }
